@@ -1,0 +1,21 @@
+<header class="card-header">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+            <a class="navbar-brand" href="{{ path('subscription') }}">
+                <img alt="Brand" src="{{ asset('assets/img/metasite-logo.png') }}">
+            </a>
+            {% if app.user %}
+                <a class="btn btn-outline-secondary" href="{{ path('logout') }}">
+                    Logout
+                </a>
+                <span class="">Welcome Admin</span>
+            {% else %}
+                <a href="{{ path('login') }}">
+                    <button type="button" class="btn btn-outline-secondary navbar-btn">Sign in</button>
+                </a>
+            {% endif %}
+            </div>
+        </div>
+    </nav>
+</header>

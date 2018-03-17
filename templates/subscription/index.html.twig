@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Subscribe to our News!{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                {{ form_start(form, {'action': path('saveSubscription'), 'method': 'POST'}) }}
+                {{ form_widget(form) }}
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
