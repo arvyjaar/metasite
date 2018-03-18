@@ -17,7 +17,7 @@ class SubscriptionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $dataFile = new DataFile();
-        $categories = $dataFile->getCategories();
+        $categories = $dataFile->getContent('categories.json');
 
         $builder
             ->add('email', EmailType::class)

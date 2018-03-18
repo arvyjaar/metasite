@@ -4,10 +4,10 @@ namespace App\Controller;
 
 use App\Jaar\DataFile;
 use App\Form\SubscriptionType;
+use App\Jaar\JaarValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
@@ -15,31 +15,47 @@ class SubscriptionController extends Controller
 {
     /**
      * @Route("/", name="subscription")
-     * @Method("GET")
+     * @Method({"GET", "POST"})
+     * @param Request $request
      * @return Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $form = $this->createForm(SubscriptionType::class);
+        $form->handleRequest($request);
 
-        return $this->render('subscription/index.html.twig', [
-            'form' => $form->createView()
-        ]);
-    }
+        if ($form->isSubmitted() && $form->isValid()) {
+            $dataFile = new DataFile();
 
-    /**
-     * @Route("/subscription/save", name="saveSubscription")
-     * @Method("POST")
-     * @param Request $request
-     * @return RedirectResponse
-     */
-    public function saveSubscription(Request $request)
-    {
-        $dataFile = new DataFile();
+            $request = $request->get('subscription');
 
-        $request = $request->get('subscription');
-        $dataFile->saveSubscription('subscribers.json', $request);
+            // Check if parameter categories is defined in HTML form
+            $categories = (isset($request['categories'])) ?? null;
+            // Validate
+            $validator = new JaarValidator($request['email'], $request['name'], $categories);
+            $formErrors = $validator->validate();
+            if (null !== $formErrors) {
+                return $this->render('subscription/index.html.twig', [
+                    'form' => $form->createView(),
+                    'errors' => $formErrors,
+                ]);
+            }
+            // If form data is valid, prepare array for saving
+            $request = [
+                'email' => $request['email'],
+                'name' => $request['name'],
+                'categories' => $request['categories'],
+                'updated_at' => date('Y-m-d H:m:s')
+            ];
 
-        return $this->redirectToRoute('subscription');
+            $dataFile->saveSubscription('subscribers.json', $request);
+
+            return $this->render('subscription/success.html.twig', ['categories' => $request['categories']]);
+
+        } else {
+            return $this->render('subscription/index.html.twig', [
+                'form' => $form->createView()
+            ]);
+        }
     }
 }

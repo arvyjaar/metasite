@@ -4,12 +4,17 @@
 
 {% block body %}
     <div class="row">
-        <div class="row">
-            <div class="col-md-12 text-center">
-                {{ form_start(form, {'action': path('saveSubscription'), 'method': 'POST'}) }}
-                {{ form_widget(form) }}
-                {{ form_end(form) }}
-            </div>
+        <div class="col-md-4 offset-md-4">
+            {% include 'partials/errors.html.twig' %}
+
+            {% form_theme form 'bootstrap_4_layout.html.twig' %}
+
+            {{ form_start(form, {'action': path('subscription'), 'method': 'POST'}) }}
+            {{ form_row(form.email) }}
+            {{ form_row(form.name) }}
+            <label>Select categories</label>
+            {{ form_widget(form.categories) }}
+            {{ form_end(form) }}
         </div>
     </div>
 {% endblock %}

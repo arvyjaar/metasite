@@ -1,0 +1,43 @@
+/* Custom styles */
+
+.page-item.active .page-link {
+    z-index: 1;
+    color: #dee2e6;
+    background-color: #b6b6b6;
+    border-color: #b6b6b6;
+}
+.navbar-header {
+    width: 80%;
+}
+.adm-greeting {
+    margin-left: 2%;
+}
+.adm-title {
+    line-height: 2em;
+    padding-left: inherit;
+}
+.fa-edit  {
+    color: #494949;
+}
+.fa-trash-alt {
+    color: #AA3333;
+}
+.alert-subsribed {
+    margin-top: 1em;
+}
+.category-box {
+    border-color: #dee2e6;
+    padding: 0.3em;
+}
+.form-check {
+    margin: 1em 0 1em 0;
+    border: 1px solid  #dee2e6;
+}
+.form-check-input {
+    margin-left: inherit;
+    top: 0.3em;
+}
+.form-check-label {
+    line-height: 2.3em;
+    padding-left: 10%;
+}

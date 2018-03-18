@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Subscribe to our News!{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-6 offset-3 text-center">
+            <div class="alert alert-success alert-subsribed">
+                <p>You are successfully subscribed to:</p>
+                <ol>
+                    {% for category in categories %}
+                        <li>
+                            {{ category }}
+                        </li>
+                    {% endfor %}
+                </ol>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 offset-3">
+            <a class="btn btn-outline-secondary text-center" href="{{ path('subscription') }}">Change</a>
+        </div>
+    </div>
+{% endblock %}

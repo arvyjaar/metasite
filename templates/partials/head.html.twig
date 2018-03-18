@@ -9,7 +9,10 @@
                 <a class="btn btn-outline-secondary" href="{{ path('logout') }}">
                     Logout
                 </a>
-                <span class="">Welcome Admin</span>
+                <a class="btn btn-outline-secondary" href="{{ path('admin') }}">
+                    Manage subscribers
+                </a>
+                <span class="adm-greeting">Signed in as {{ app.user.username }}</span>
             {% else %}
                 <a href="{{ path('login') }}">
                     <button type="button" class="btn btn-outline-secondary navbar-btn">Sign in</button>

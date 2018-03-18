@@ -1,0 +1,7 @@
+{% if errors is defined %}
+    {% for e in errors %}
+        <div class="alert alert-danger alert-subsribed">
+            {{ e }}
+        </div>
+    {% endfor %}
+{% endif %}

@@ -10,55 +10,67 @@ class DataFile
      */
     public function saveSubscription($file, $request)
     {
-        $jsonObj = $this->read($file);
+        $content = $this->getContent($file);
 
-        if ($jsonObj) {
-            $newJson = [];
-            foreach ($jsonObj as $item) {
+        if ($content) {
+            $newContent = [];
+            foreach ($content as $item) {
                 if ($item->email != $request['email']) {
-                    array_push($newJson, $item);
+                    array_push($newContent, $item);
                 }
             }
-            array_push($newJson, [
-                'email' => $request['email'],
-                'name' => $request['name'],
-                'categories' => $request['categories'],
-                'updated_at' => date('Y-m-d H:m:s')
-            ]);
+            array_push($newContent, $request);
 
-            file_put_contents(__DIR__ . '/../Data/' . $file, json_encode($newJson));
+            file_put_contents(__DIR__ . '/../Data/' . $file, json_encode($newContent));
         } else {
-            file_put_contents(__DIR__ . '/../Data/' . $file, json_encode([
-                [
-                    'email' => $request['email'],
-                    'name' => $request['name'],
-                    'categories' => $request['categories'],
-                    'updated_at' => date('Y-m-d H:m:s')
-                ]]
-            ));
+            file_put_contents(__DIR__ . '/../Data/' . $file, json_encode([$request]));
         }
-    }
-
-    /**
-     * @return array
-     */
-    public function getCategories()
-    {
-        $content = $this->read('categories.json');
-        $categories = $content->categories;
-
-        return $categories;
     }
 
     /**
      * @param string $file
      * @return object
      */
-    private function read($file)
+    public function getContent($file)
     {
         $content = file_get_contents(__DIR__ . '/../Data/' . $file);
-        $jsonObj = json_decode($content);
+        $content = json_decode($content);
 
-        return $jsonObj;
+        return $content;
+    }
+
+    /**
+     * @param string $file
+     * @param string $id
+     */
+    public function delete($file, $id)
+    {
+        $content = $this->getContent($file);
+        $newContent = [];
+        foreach ($content as $item) {
+            if ($item->email != $id) {
+                array_push($newContent, $item);
+            }
+        }
+        file_put_contents(__DIR__ . '/../Data/' . $file, json_encode($newContent));
+    }
+
+    /**
+     * @param string $file
+     * @param string $id
+     * @return array
+     */
+    public function getItem($file, $id)
+    {
+        $result = [];
+        $content = $this->getContent($file);
+        foreach ($content as $item) {
+            if ($item->email == $id) {
+                $result = $item;
+                break;
+            }
+        }
+
+        return $result;
     }
 }

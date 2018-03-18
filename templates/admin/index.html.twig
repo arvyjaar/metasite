@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin | Subscribers{% endblock %}
+{% block stylesheets %}
+    <!-- Datatables -->
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css">
+
+{% endblock %}
+{% block body %}
+    <div class="row">
+        <div class="col-md-6">
+            <h2 class="adm-title">Subscribers</h2>
+        </div>
+        <div class="col-md-6 text-center">
+            {% for message in app.flashes('notice') %}
+                <div class="alert alert-success alert-subsribed">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <table id="subscribers" class="table table-responsive-md table-hover" style="width:100%">
+                <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Categories</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for subscriber in subscribers %}
+                    <tr>
+                        <td>{{ subscriber.email }}</td>
+                        <td>{{ subscriber.name }}</td>
+                        <td>
+                            {% for category in subscriber.categories %}
+                                <span class="border category-box">{{ category }}</span>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {{ subscriber.updated_at }}
+                        </td>
+                        <td class="d-flex justify-content-center">
+                            <a href="{{ path('edit', {'id':subscriber.email}) }}" class="btn btn-outline-secondary"><i class="fa fa-edit"></i></a>
+                            <span class="p-2"></span>
+                            <form action="{{ path('delete', {'id':subscriber.email}) }}" method="post">
+                                <input type="hidden" name="token" value="{{ csrf_token('adm_delete') }}"/>
+                                <button type="submit" class="btn btn-outline-secondary"><i class="fa fa-trash-alt"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    <!-- Datatables -->
+    <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script src="//cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/solid.js"
+            integrity="sha384-+Ga2s7YBbhOD6nie0DzrZpJes+b2K1xkpKxTFFcx59QmVPaSA8c7pycsNaFwUK6l"
+            crossorigin="anonymous"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/fontawesome.js"
+            integrity="sha384-7ox8Q2yzO/uWircfojVuCQOZl+ZZBg2D2J5nkpLqzH1HY0C1dHlTKIbpRz/LG23c"
+            crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+            $('#subscribers').DataTable({
+                columnDefs: [
+                    {
+                        targets: [0, 1, 2],
+                        className: 'mdl-data-table__cell--non-numeric'
+                    }
+                ]
+            });
+        });
+    </script>
+{% endblock %}
