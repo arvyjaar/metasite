@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Jaar;
+namespace App\Service;
 
 use Symfony\Component\Filesystem\Filesystem;
 
-class DataFile
+class FileDataHandler implements DataHandlerInterface
 {
     /**
      * @param string $file
@@ -32,7 +32,7 @@ class DataFile
 
     /**
      * @param string $file
-     * @return object
+     * @return array
      */
     public function getContent($file)
     {

@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Jaar\DataFile;
+//use App\Jaar\DataFile;
 use App\Form\SubscriptionType;
 use App\Jaar\JaarValidator;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,12 +21,13 @@ class SubscriptionController extends Controller
      */
     public function index(Request $request)
     {
-        $form = $this->createForm(SubscriptionType::class);
+        $datahandler = $this->container->get('app.datahandler');
+
+        // Necessary inject app.datahandler service to SubscriptionType to get array for 'choices'
+        $form = $this->createForm(SubscriptionType::class, null, ['datahandler' => $datahandler]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $dataFile = new DataFile();
-
             $request = $request->get('subscription');
 
             // Check if parameter categories is defined in HTML form
@@ -48,7 +49,7 @@ class SubscriptionController extends Controller
                 'updated_at' => date('Y-m-d H:m:s')
             ];
 
-            $dataFile->saveSubscription('subscribers.json', $request);
+            $datahandler->saveSubscription('subscribers.json', $request);
 
             return $this->render('subscription/success.html.twig', ['categories' => $request['categories']]);
 
