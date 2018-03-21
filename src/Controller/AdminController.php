@@ -103,47 +103,5 @@ class AdminController extends Controller
                 'form' => $form->createView()
             ]);
         }
-
-//form
-/*        $submittedToken = $request->request->get('token');
-
-        if ($submittedToken && $this->isCsrfTokenValid('adm_edit', $submittedToken)) {
-            $fields = $request->get('subscription');
-
-            $subscriber = new Subscriber();
-            $subscriber->setEmail($fields['email'] ?? null);
-            $subscriber->setName($fields['name'] ?? null);
-            $subscriber->setCategories($fields['categories'] ?? []);
-            $subscriber->setUpdatedAt(date('Y-m-d H:m:s'));
-            
-            $errors = $validator->validate($subscriber);
-            $existingCategories = $datahandler->getContent('categories.json');
-            foreach($fields['categories'] as $category) {
-                if (! in_array($category, $existingCategories)) {
-                    throw new \Exception('Submited value is not from categores array!');
-                }
-            }
-            if (count($errors) > 0) {
-                return $this->render('admin/edit.html.twig', [
-                    'id' => $id,
-                    'subscriber' => $subscriber,
-                    'errors' => $errors,
-                ]);
-            }
-            // Validation passed
-            $datahandler->saveSubscription('subscribers.json', $subscriber);
-
-            $this->addFlash(
-                'notice',
-                'Your changes were saved!'
-            );
-
-            return $this->redirectToRoute('admin');
-        } else {
-            return $this->render('admin/edit.html.twig', [
-                'id' => $id,
-                'subscriber' => $subscriber,
-            ]);
-        }*/
     }
 }
