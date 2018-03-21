@@ -10,6 +10,7 @@
             {% form_theme form 'bootstrap_4_layout.html.twig' %}
 
             {{ form_start(form, {'action': path('subscription'), 'method': 'POST'}) }}
+            {{ form_errors(form) }}
             {{ form_row(form.email) }}
             {{ form_row(form.name) }}
             <label>Select categories</label>

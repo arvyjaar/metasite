@@ -18,29 +18,26 @@ class Subscriber
     private $id;
 
     /**
-     * @ORM\Column(type="string", length="30")
-     * @Assert\NotBlank()
-     * @Assert\Email()
+     * @ORM\Column(type="string")
+     * @Assert\NotBlank(message="Provide your email")
+     * @Assert\Email(message="Email not valid")
      */
     private $email;
 
     /**
-     * @ORM\Column(type="string", length="30")
-     * @Assert\NotBlank()
+     * @ORM\Column(type="string")
+     * @Assert\NotBlank(message="Provide your name")
      */
     private $name;
 
     /**
-     * @ORM\Column(type="array")
-     * @Assert\NotBlank()
-     * @Assert\Array()
+     * @ORM\Column(type="text")
+     * @Assert\NotBlank(message="Select at least one category")
      */
     private $categories;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Assert\NotBlank()
-     * @Assert\DateTime()
      */
     private $updated_at;
 
@@ -85,12 +82,12 @@ class Subscriber
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
+    public function getUpdatedAt(): ?string
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(\DateTimeInterface $updated_at): self
+    public function setUpdatedAt(string $updated_at): self
     {
         $this->updated_at = $updated_at;
 

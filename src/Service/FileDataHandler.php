@@ -8,25 +8,32 @@ class FileDataHandler implements DataHandlerInterface
 {
     /**
      * @param string $file
-     * @param array $request
+     * @param Subscriber $subscriber
      */
-    public function saveSubscription($file, $request)
+    public function saveSubscription($file, $subscriber)
     {
         $content = $this->getContent($file);
         $filesystem = new Filesystem();
 
+        $newItem = [
+            'email' => $subscriber->getEmail(), 
+            'name' => $subscriber->getName(), 
+            'categories' => $subscriber->getCategories(),
+            'updated_at' => $subscriber->getUpdatedAt(),
+        ];
+
         if ($content) {
             $newContent = [];
             foreach ($content as $item) {
-                if ($item->email != $request['email']) {
+                if ($item->email !== $subscriber->getEmail()) {
                     array_push($newContent, $item);
                 }
             }
-            array_push($newContent, $request);
+            array_push($newContent, $newItem);
 
             $filesystem->dumpFile(__DIR__ . '/../Data/' . $file, json_encode($newContent));
         } else {
-            $filesystem->dumpFile(__DIR__ . '/../Data/' . $file, json_encode([$request]));
+            $filesystem->dumpFile(__DIR__ . '/../Data/' . $file, json_encode([$newItem]));
         }
     }
 

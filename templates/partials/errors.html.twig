@@ -1,7 +1,7 @@
 {% if errors is defined %}
     {% for e in errors %}
         <div class="alert alert-danger alert-subsribed">
-            {{ e }}
+            {{ e.message }}
         </div>
     {% endfor %}
 {% endif %}
