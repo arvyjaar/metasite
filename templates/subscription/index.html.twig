@@ -10,6 +10,7 @@
             {% form_theme form 'bootstrap_4_layout.html.twig' %}
 
             {{ form_start(form, {'action': path('subscription'), 'method': 'POST'}) }}
+            {{ form_errors(form) }}
             {{ form_row(form.email) }}
             {{ form_row(form.name) }}
             <label>Select categories</label>
@@ -19,7 +20,7 @@
     </div>
 {% endblock %}
 {% block footer %}
-    <div class="card-footer text-left">
+    <div class="card-footer text-left fixed-bottom">
         <p>JAAR, {{ 'now'|date('Y') }}</p>
     </div>
 {% endblock %}

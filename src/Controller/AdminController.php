@@ -2,14 +2,14 @@
 
 namespace App\Controller;
 
-use App\Jaar\DataFile;
-use App\Jaar\JaarValidator;
+use App\Entity\Subscriber;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class AdminController extends Controller
@@ -25,8 +25,9 @@ class AdminController extends Controller
         if (! $user) {
             throw new AccessDeniedException();
         }
-        $dataFile = new DataFile();
-        $subscribers = $dataFile->getContent('subscribers.json');
+
+        $datahandler = $this->container->get('app.datahandler');
+        $subscribers = $datahandler->getContent('subscribers.json');
 
         return $this->render('admin/index.html.twig', [
             'subscribers' => $subscribers,
@@ -50,8 +51,8 @@ class AdminController extends Controller
         $submittedToken = $request->request->get('token');
 
         if ($submittedToken && $this->isCsrfTokenValid('adm_delete', $submittedToken)) {
-            $dataFile = new DataFile();
-            $dataFile->delete('subscribers.json', $id);
+            $datahandler = $this->container->get('app.datahandler');
+            $datahandler->delete('subscribers.json', $id);
 
             $this->addFlash(
                 'notice',
@@ -69,42 +70,44 @@ class AdminController extends Controller
      * @param Request $request
      * @return Response
      */
-    public function edit(Request $request, $id)
+    public function edit(Request $request, $id, ValidatorInterface $validator)
     {
         $user = $this->getUser();
         if (! $user) {
             throw new AccessDeniedException();
         }
 
-        $dataFile = new DataFile();
-        $subscriber = $dataFile->getItem('subscribers.json', $id);
+        $datahandler = $this->container->get('app.datahandler');
+        $subscriber = $datahandler->getItem('subscribers.json', $id);
 
         $submittedToken = $request->request->get('token');
 
         if ($submittedToken && $this->isCsrfTokenValid('adm_edit', $submittedToken)) {
-            // Check if parameter categories is defined in HTML form
-            $request = $request->get('subscription');
-            $categories = (isset($request['categories'])) ?? null;
-            // Validate
-            $validator = new JaarValidator($request['email'], $request['name'], $categories);
-            $formErrors = $validator->validate();
-            if (null !== $formErrors) {
+            $fields = $request->get('subscription');
+
+            $subscriber = new Subscriber();
+            $subscriber->setEmail($fields['email'] ?? null);
+            $subscriber->setName($fields['name'] ?? null);
+            $subscriber->setCategories($fields['categories'] ?? []);
+            $subscriber->setUpdatedAt(date('Y-m-d H:m:s'));
+            
+            $errors = $validator->validate($subscriber);
+            $existingCategories = $datahandler->getContent('categories.json');
+            foreach($fields['categories'] as $category) {
+                if (! in_array($category, $existingCategories)) {
+                    throw new \Exception('Submited value is not from categores array!');
+                    $errors->message = 'Submited value is not from categores array!';
+                }
+            }
+            if (count($errors) > 0) {
                 return $this->render('admin/edit.html.twig', [
                     'id' => $id,
                     'subscriber' => $subscriber,
-                    'errors' => $formErrors,
+                    'errors' => $errors,
                 ]);
             }
-
-            // If form data is valid, prepare array for saving
-            $request = [
-                'email' => $request['email'],
-                'name' => $request['name'],
-                'categories' => $request['categories'],
-                'updated_at' => date('Y-m-d H:m:s')
-            ];
-
-            $dataFile->saveSubscription('subscribers.json', $request);
+            // Validation passed
+            $datahandler->saveSubscription('subscribers.json', $subscriber);
 
             $this->addFlash(
                 'notice',
