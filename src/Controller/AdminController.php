@@ -92,6 +92,13 @@ class AdminController extends Controller
             $subscriber->setUpdatedAt(date('Y-m-d H:m:s'));
             
             $errors = $validator->validate($subscriber);
+            $existingCategories = $datahandler->getContent('categories.json');
+            foreach($fields['categories'] as $category) {
+                if (! in_array($category, $existingCategories)) {
+                    throw new \Exception('Submited value is not from categores array!');
+                    $errors->message = 'Submited value is not from categores array!';
+                }
+            }
             if (count($errors) > 0) {
                 return $this->render('admin/edit.html.twig', [
                     'id' => $id,
