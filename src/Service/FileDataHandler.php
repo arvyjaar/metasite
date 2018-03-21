@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Subscriber;
 use Symfony\Component\Filesystem\Filesystem;
 
 class FileDataHandler implements DataHandlerInterface

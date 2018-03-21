@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+Use App\Form\SubscriptionType;
 
 class AdminController extends Controller
 {
@@ -21,11 +21,6 @@ class AdminController extends Controller
      */
     public function index()
     {
-        $user = $this->getUser();
-        if (! $user) {
-            throw new AccessDeniedException();
-        }
-
         $datahandler = $this->container->get('app.datahandler');
         $subscribers = $datahandler->getContent('subscribers.json');
 
@@ -43,11 +38,6 @@ class AdminController extends Controller
      */
     public function delete(Request $request, $id)
     {
-        $user = $this->getUser();
-        if (! $user) {
-            throw new AccessDeniedException();
-        }
-
         $submittedToken = $request->request->get('token');
 
         if ($submittedToken && $this->isCsrfTokenValid('adm_delete', $submittedToken)) {
@@ -68,19 +58,54 @@ class AdminController extends Controller
      * @Route("/admin/edit/{id}", name="edit")
      * @Method({"GET", "POST"})
      * @param Request $request
+     * @param string $id
+     * @param ValidatorInterface $validator
      * @return Response
+     * @throws \Exception
      */
     public function edit(Request $request, $id, ValidatorInterface $validator)
     {
-        $user = $this->getUser();
-        if (! $user) {
-            throw new AccessDeniedException();
-        }
-
         $datahandler = $this->container->get('app.datahandler');
         $subscriber = $datahandler->getItem('subscribers.json', $id);
 
-        $submittedToken = $request->request->get('token');
+        $form = $this->createForm(SubscriptionType::class, $subscriber, ['datahandler' => $datahandler]);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $fields = $request->get('subscription');
+
+            $subscriber = new Subscriber();
+            $subscriber->setEmail($fields['email'] ?? null);
+            $subscriber->setName($fields['name'] ?? null);
+            $subscriber->setCategories($fields['categories'] ?? []);
+            $subscriber->setUpdatedAt(date('Y-m-d H:m:s'));
+
+            $errors = $validator->validate($subscriber);
+            if (count($errors) > 0) {
+                return $this->render('admin/edit.html.twig', [
+                    'form' => $form->createView(),
+                    'subscriber' => $subscriber,
+                    'errors' => $errors,
+                ]);
+            }
+
+            $datahandler->saveSubscription('subscribers.json', $subscriber);
+
+            $this->addFlash(
+                'notice',
+                'Your changes were saved!'
+            );
+
+            return $this->redirectToRoute('admin');
+
+        } else {
+            return $this->render('admin/edit.html.twig', [
+                'subscriber' => $subscriber,
+                'form' => $form->createView()
+            ]);
+        }
+
+//form
+/*        $submittedToken = $request->request->get('token');
 
         if ($submittedToken && $this->isCsrfTokenValid('adm_edit', $submittedToken)) {
             $fields = $request->get('subscription');
@@ -96,7 +121,6 @@ class AdminController extends Controller
             foreach($fields['categories'] as $category) {
                 if (! in_array($category, $existingCategories)) {
                     throw new \Exception('Submited value is not from categores array!');
-                    $errors->message = 'Submited value is not from categores array!';
                 }
             }
             if (count($errors) > 0) {
@@ -120,6 +144,6 @@ class AdminController extends Controller
                 'id' => $id,
                 'subscriber' => $subscriber,
             ]);
-        }
+        }*/
     }
 }

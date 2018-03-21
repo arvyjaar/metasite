@@ -5,7 +5,7 @@
 {% block body %}
     <div class="row">
         <div class="col-md-12">
-            <h2 class="adm-title">Edit subscriber</h2>
+            <h4 class="adm-title">Edit subscriber</h4>
         </div>
     </div>
     <div class="row">
@@ -13,32 +13,17 @@
 
             {% include 'partials/errors.html.twig' %}
 
-            <form action="{{ path('edit', {'id':subscriber.email}) }}" method="post">
-                <div class="form-group">
-                    <input type="hidden" name="token" value="{{ csrf_token('adm_edit') }}"/>
-                    <label for="email">Email</label>
-                    <input type="email" id="email" class="form-control" name="subscription[email]" required="required"
-                           value="{{ subscriber.email }}">
-                </div>
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" class="form-control" name="subscription[name]" required="required"
-                           value="{{ subscriber.name }}">
-                </div>
-                    {% for category in subscriber.categories %}
-                        <input type="hidden" name="subscription[categories][]" value="{{ category }}">
-                    {% endfor %}
-                <div class="form-group">
-                    <div class="">
-                        {% for category in subscriber.categories %}
-                            <span class="border category-box">{{ category }}</span>
-                        {% endfor %}
-                    </div>
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-outline-secondary">Save</button>
-                </div>
-            </form>
+            {% form_theme form 'bootstrap_4_layout.html.twig' %}
+
+            {{ form_start(form, {'action': path('edit', {'id':subscriber.email}), 'method': 'POST'}) }}
+            {{ form_errors(form) }}
+            {{ form_row(form.email) }}
+            {{ form_row(form.name) }}
+            <label>Selected categories</label>
+            {{ form_widget(form.categories) }}
+            {{ form_widget(form.Subscribe, {'label': 'Save'}) }}
+            {{ form_end(form) }}
+
         </div>
     </div>
 {% endblock %}
